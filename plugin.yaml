@@ -1,0 +1,170 @@
+name: aws-ec2-ice-host-node-execution
+description: This plugin provides a node-executor and file-copier supporting ssh actions through AWS EC2 Instance Connect Endpoint.
+rundeckPluginVersion: 1.2
+author: (C) Ed Kingscote
+date: 10/10/2024
+version: 1.0.0
+rundeckCompatibilityVersion: 3.x
+targetHostCompatibility: unix
+license: Apache 2.0
+tags:
+  - script
+  - node executor
+  - file copier
+sourceLink: https://github.com/EdKingscote/rundeck-plugin-aws-ec2-ice-node-execution
+providers:
+    - name: aws-ec2-ice-host.node-executor
+      service: NodeExecutor
+      title: OpenSSH / AWS EC2 ICE / Node Executor
+      description: 'Execute commands through AWS EC2 ICE'
+      plugin-type: script
+      script-interpreter: /bin/bash
+      script-file: node-executor
+      script-args: ${exec.command}
+      config:
+        - name: aws_access_key_id
+          title: AWS Access Key ID
+          type: String
+          required: true
+          description: 'The AWS Access Key'
+          scope: Project
+          renderingOptions:
+            groupName: AWS
+        - name: aws_secret_access_key_storage_path
+          title: AWS Secret Access Key
+          type: String
+          required: true
+          description: 'Path to the AWS Secret Key to use within Key Storage.'
+          scope: Project
+          renderingOptions:
+            groupName: AWS 
+            selectionAccessor: "STORAGE_PATH"
+            valueConversion: "STORAGE_PATH_AUTOMATIC_READ"
+            storage-path-root: "keys"
+            storage-file-meta-filter: "Rundeck-key-type=password"
+        - name: aws_default_region
+          title: AWS Default Region
+          type: String
+          required: true
+          description: 'The Default AWS Region'
+          scope: Project
+        - name: ssh_key_storage_path
+          title: Node SSH Key
+          type: String
+          required: false
+          description: "Optional storage path for Node ssh-key file. Declare a node attribute named ssh-key-storage-path."
+          scope: Instance
+          renderingOptions:
+            selectionAccessor: "STORAGE_PATH"
+            valueConversion: "STORAGE_PATH_AUTOMATIC_READ"
+            storage-path-root: "keys"
+            instance-scope-node-attribute: "ssh-key-storage-path"
+            storage-file-meta-filter: "Rundeck-key-type=private"            
+        - name: ssh_opts
+          title: 'SSH Options'
+          type: String
+          required: false
+          description: 'Optional SSH command line arguments. You can overwrite this attribute at node level using ssh-ssh-config'
+          default: '-q -oClearAllForwardings=yes'
+          scope: Instance
+          renderingOptions:
+            instance-scope-node-attribute: "ssh-ssh-config"
+        - name: ssh_config
+          title: 'Template ssh_config'
+          type: String
+          required: true
+          description: 'The SSH config template'
+          scope: Project          
+          renderingOptions:
+            displayType: CODE
+            codeSyntaxMode: batchfile
+          default: |
+              Host i-*
+                StrictHostKeyChecking no
+                Port 22
+                ProxyCommand aws ec2-instance-connect open-tunnel --instance-id @instance_id@
+                IdentityFile @ssh_key@
+        - name: dry_run
+          title: 'Dry run?'
+          type: Boolean
+          required: false
+          description: 'Just echo what would be done'
+    - name: aws-ec2-ice-host.file-copier
+      service: FileCopier
+      title: OpenSSH / AWS EC2 ICE / File Copier
+      description: 'Copies to a remote host via AWS EC2 ICE'
+      plugin-type: script
+      script-interpreter: /bin/bash
+      script-file: file-copier
+      script-args: ${file-copy.file} ${file-copy.destination} 
+      config:
+        - name: aws_access_key_id
+          title: AWS Access Key ID
+          type: String
+          required: true
+          description: 'The AWS Access Key'
+          scope: Project
+          renderingOptions:
+            groupName: AWS Authentication
+        - name: aws_secret_access_key_storage_path
+          title: AWS Secret Access Key
+          type: String
+          required: true
+          description: 'Path to the AWS Secret Key to use within Key Storage.'
+          scope: Project
+          renderingOptions:
+            groupName: AWS
+            selectionAccessor: "STORAGE_PATH"
+            valueConversion: "STORAGE_PATH_AUTOMATIC_READ"
+            storage-path-root: "keys"
+            storage-file-meta-filter: "Rundeck-key-type=password"
+        - name: aws_default_region
+          title: AWS Default Region
+          type: String
+          required: true
+          description: 'The Default AWS Region'
+          scope: Project
+          renderingOptions:
+            groupName: AWS
+        - name: ssh_key_storage_path
+          title: Node SSH Key
+          type: String
+          required: false
+          description: "Optional storage path for Node ssh-key file. Declare a node attribute named ssh-key-storage-path."
+          scope: Instance
+          renderingOptions:
+            selectionAccessor: "STORAGE_PATH"
+            valueConversion: "STORAGE_PATH_AUTOMATIC_READ"
+            storage-path-root: "keys"
+            instance-scope-node-attribute: "ssh-key-storage-path"
+            storage-file-meta-filter: "Rundeck-key-type=private"
+        - name: ssh_opts
+          title: 'SSH Options'
+          type: String
+          required: false
+          description: 'Optional SSH command line arguments. You can overwrite this attribute at node level using ssh-scp-config'
+          default: '-q -oClearAllForwardings=yes'
+          scope: Instance
+          renderingOptions:
+            instance-scope-node-attribute: "ssh-scp-config"
+        - name: ssh_config
+          title: 'Template ssh_config'
+          type: String
+          required: true
+          description: 'The SSH config template'
+          scope: Project
+          renderingOptions:
+            displayType: CODE
+            codeSyntaxMode: batchfile
+          default: |
+              Host i-*
+                StrictHostKeyChecking no
+                Port 22
+                ProxyCommand aws ec2-instance-connect open-tunnel --instance-id @instance_id@
+                IdentityFile @ssh_key@
+        - name: dry_run
+          title: 'Dry run?'
+          type: Boolean
+          required: false
+          description: 'Just echo what would be done'
+        

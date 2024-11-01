@@ -77,6 +77,16 @@ Using Dry run, you might see output similar to this:
 	/tmp/motd
 	Copied: /tmp/motd
 
+## IAM Policies
+
+The user will need to have the EC2InstanceConnect Permissions Policy
+
+## EC2 Node Source Configuration
+
+When using the AWS EC2 Node Resources Node Source, the following should be included in the Mapping Params to map the AWS instance ID to the hostname.
+
+`hostname.selector=instanceId`
+
 ## Docker
 
 An example Dockerfile is provided to install the AWS CLI v2 on the latest base Rundeck container from Dockerhub.

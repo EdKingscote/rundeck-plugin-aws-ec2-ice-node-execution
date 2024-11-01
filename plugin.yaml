@@ -41,7 +41,7 @@ providers:
             selectionAccessor: "STORAGE_PATH"
             valueConversion: "STORAGE_PATH_AUTOMATIC_READ"
             storage-path-root: "keys"
-            storage-file-meta-filter: "Rundeck-key-type=password"
+            storage-file-meta-filter: "Rundeck-data-type=password"
         - name: aws_default_region
           title: AWS Default Region
           type: String
@@ -119,7 +119,7 @@ providers:
             selectionAccessor: "STORAGE_PATH"
             valueConversion: "STORAGE_PATH_AUTOMATIC_READ"
             storage-path-root: "keys"
-            storage-file-meta-filter: "Rundeck-key-type=password"
+            storage-file-meta-filter: "Rundeck-data-type=password"
         - name: aws_default_region
           title: AWS Default Region
           type: String

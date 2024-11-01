@@ -48,6 +48,8 @@ providers:
           required: true
           description: 'The Default AWS Region'
           scope: Project
+          renderingOptions:
+            groupName: AWS 
         - name: ssh_key_storage_path
           title: Node SSH Key
           type: String
@@ -105,7 +107,7 @@ providers:
           description: 'The AWS Access Key'
           scope: Project
           renderingOptions:
-            groupName: AWS Authentication
+            groupName: AWS 
         - name: aws_secret_access_key_storage_path
           title: AWS Secret Access Key
           type: String
